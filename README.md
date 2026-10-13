@@ -109,6 +109,7 @@ Le modèle relationnel permet de relier les dimensions produit, commande, transp
 - Le périmètre d’expédition couvre un mois : il ne permet pas de conclure sur une saisonnalité annuelle.
 
 Livrables:
+
 [Script_tables](Script_requêtes_BDD_Regaload.sql)
 
 [Questions_business](Questions_business_Regaload.sql)
