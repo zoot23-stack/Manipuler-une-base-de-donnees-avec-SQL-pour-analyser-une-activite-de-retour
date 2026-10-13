@@ -18,7 +18,7 @@ Comment exploiter les données de commandes, d’expéditions et de remboursemen
 ## Jeu de données
 Les données de départ sont regroupées dans un tableau unique au format csv contenant les informations sur les clients, les commandes, les produits, les colis, les expéditions et les éventuels retours et remboursements.
 Chaque ligne décrit un produit expédié dans un colis pour une commande donnée, avec les informations de remboursement et de retour lorsqu’elles sont renseignées.
-Ces données ont été réparties dans une base relationnelle couvrant les expéditions du *1er au 31 mars 2022*, organisée en six tables métier :
+Ces données ont été réparties dans une base relationnelle couvrant les expéditions du *1er au 31 mars 2022*, organisée en six tables métier 
 
 | Table | Rôle | Nombre d'enregistrements |
 | :--- | :--- | --- |
@@ -32,6 +32,8 @@ Ces données ont été réparties dans une base relationnelle couvrant les expé
 La table Ligne_Expedition relie les commandes, colis et produits. Chaque enregistrement de Retour_Remboursement est rattaché à une ligne d’expédition.
 Cette organisation limite la répétition des informations et permet de croiser les données grâce aux clés primaires et étrangères. Le dictionnaire de données documente les champs, les types, les contraintes et les règles de calcul.
 Le dictionnaire décrit les champs, les types, les contraintes et les règles de calcul. Les dates sont stockées comme chaînes de caractères dans la base fournie.
+
+![Schéma relationnel](_2_schéma relationnel_052026.pdf)
 
 ## Outils
 - **SQLite** : moteur de la base, stockée dans un fichier.db
@@ -104,4 +106,8 @@ Cet indicateur aide à comparer les marques, sans mesurer directement la satisfa
 
 ## Enseignements et limites
 Le modèle relationnel permet de relier les dimensions produit, commande, transport et remboursement. Les requêtes rendent les questions métier mesurables et mettent en évidence des différences à approfondir.
-- Le périmètre d’expédition couvre un mois : il ne permet pas de conclure sur une saisonnalité annuelle. 
+- Le périmètre d’expédition couvre un mois : il ne permet pas de conclure sur une saisonnalité annuelle.
+
+Livrables:
+[Script_tables](Script_requêtes_BDD_Regaload.sql)
+[Questions_business](Questions_business_Regaload.sql)
