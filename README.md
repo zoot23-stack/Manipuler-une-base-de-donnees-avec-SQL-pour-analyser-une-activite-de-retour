@@ -1,23 +1,26 @@
 # Manipuler-une-base-de-donnees-avec-SQL-pour-analyser-une-activite-de-retour
-Identifiez les causes de retour de colis d'une entreprise d'e-commerce. Proposez ensuite des solutions pour limiter certains retours, et en valoriser d'autres.
+
+Analyse des retours et remboursements avec SQL
 
 ## Présentation du projet
 L'entreprise Regaload commercialise des produits high-tech, de bricolage, d’ameublement et d’autres catégories. Les retours et remboursements représentent des enjeux financiers, logistiques et environnementaux.
-Ma mission consiste à documenter les données, construire une base relationnelle et interroger les informations pour répondre aux questions des équipes métier.
-## Problématique
-Comment relier les commandes, les expéditions, les produits et les remboursements pour comprendre les pertes et identifier les priorités d’amélioration ?
+Au sein de l’équipe chargée des remboursements, ma mission est de créer et alimenter une base de données relationnelle reliant les clients, les commandes, les colis, les produits et les remboursements, puis d’exécuter des requêtes SQL pour répondre aux questions métier des équipes financière, logistique, transport et achats : mesurer les montants remboursés, comparer les transporteurs, repérer les problèmes d’emballage et évaluer la valeur récupérée grâce aux retours.
 
-## Objectifs principaux
-1. Documenter les données et leurs règles de gestion.
-2. Concevoir un schéma relationnel avec clés primaires et étrangères.
-3. Créer et alimenter une base SQLite.
-4. Répondre à dix questions métier grâce à SQL.
-5. Analyser les remboursements selon les produits, les transporteurs, les bâtiments et les lignes d’emballage.
-6. Évaluer la compensation des retours et une hypothèse de prestation externe.
+### Problématique
+Comment exploiter les données de commandes, d’expéditions et de remboursements pour identifier les principales sources de pertes et améliorer la gestion des retours produits chez Regaload ?
 
+## Objectifs métier
+- Quantifier les montants remboursés.
+- Identifier les produits et les flux logistiques à investiguer.
+- Évaluer la valeur récupérée grâce aux retours.
+- Éclairer les décisions des équipes métier pour réduire les pertes.
+  
 ## Jeu de données
-La base fournie couvre les expéditions du 1er au 31 mars 2022. Elle contient six tables métier.
-| Table | Rôle | Nombre de ligne |
+Les données de départ sont regroupées dans un tableau unique au format csv contenant les informations sur les clients, les commandes, les produits, les colis, les expéditions et les éventuels retours et remboursements.
+Chaque ligne décrit un produit expédié dans un colis pour une commande donnée, avec les informations de remboursement et de retour lorsqu’elles sont renseignées.
+Ces données ont été réparties dans une base relationnelle couvrant les expéditions du *1er au 31 mars 2022*, organisée en six tables métier :
+
+| Table | Rôle | Nombre d'enregistrements |
 | :--- | :--- | --- |
 | Client | Identifiants clients | 143 096 |
 | Commande | Commandes et rattachement aux clients | 251 617 |
@@ -27,30 +30,45 @@ La base fournie couvre les expéditions du 1er au 31 mars 2022. Elle contient si
 | Retour_Remboursement | Motifs, montants remboursés et devenir des produits | 13 778 |
 
 La table Ligne_Expedition relie les commandes, colis et produits. Chaque enregistrement de Retour_Remboursement est rattaché à une ligne d’expédition.
+Cette organisation limite la répétition des informations et permet de croiser les données grâce aux clés primaires et étrangères. Le dictionnaire de données documente les champs, les types, les contraintes et les règles de calcul.
 Le dictionnaire décrit les champs, les types, les contraintes et les règles de calcul. Les dates sont stockées comme chaînes de caractères dans la base fournie.
 
-## Outils et technologies
-- SQLite : base relationnelle et exécution des requêtes SQL.
-- SQL : jointures, filtres, agrégations et calculs de ratios.
-- Excel : dictionnaire de données et documentation des questions, requêtes et résultats.
-- dbdiagram.io : outil indiqué sur le schéma relationnel fourni.
-Le livrable technique principal est une base .db
+## Outils
+- **SQLite** : moteur de la base, stockée dans un fichier.db
+- **Letos 4.0.1 (anciennement SQLiteStudio)** : interface utilisée pour manipuler la base et exécuter les requêtes.
+- **Excel** : dictionnaire de données et documentation des questions, requêtes et résultats.
+- **dbdiagram.io** : conception du schéma relationnel.
 
-## Analyse SQL
-- SELECT, WHERE et IN : sélectionner et filtrer les informations.
-- LEFT JOIN : relier les expéditions, les colis, les produits et les remboursements.
-- SUM, COUNT et GROUP BY : calculer les montants et segmenter les résultats.
-- ROUND et NULLIF : présenter les ratios et protéger certains calculs contre une division par zéro.
-- WITH : structurer l’analyse des flux non livrés et des retours associés.
-- HAVING et ORDER BY : sélectionner les groupes pertinents et classer les résultats.
+## Méthodes SQL utilisées
+- Jointures *LEFT JOIN* pour relier les tables.
+- Filtres *WHERE* pour sélectionner les données pertinentes.
+- Agrégations *SUM* et *COUNT* pour calculer les montants et compter les enregistrements.
+- Regroupements *GROUP BY* pour comparer les résultats par catégorie.
+- Tris *ORDER BY* pour classer les résultats.
+- Expressions communes *WITH* pour structurer les requêtes.
+- Arrondis *ROUND* et utilisation de *NULLIF* pour éviter certaines divisions par zéro.
 
 ## Démarche d’analyse
 1. Explorer et documenter les champs utiles aux questions métier.
 2. Modéliser les entités et leurs relations.
-3. Créer et charger les six tables de la base SQLite.
+3. Créer et alimenter les six tables de la base SQLite.
 4. Interroger les données pour les équipes marge, retours, transport, logistique et achats.
-5. Comparer les montants, ratios et segments pour éclairer les décisions.
-Les dix questions portent sur le total des remboursements, leur répartition par bâtiment et semaine, les motifs, les rétractations sans retour, la compensation, les transporteurs, les flux non livrés, les départements, les avaries et les marques de multicuiseurs.
+5. Comparer les montants, les ratios et les segments pour éclairer les décisions.
+
+Les questions  business portent sur les remboursements, les motifs de retour, la compensation, les transporteurs, les flux non livrés, les départements, les avaries et les marques de multicuiseurs.
+
+## Chargement des données
+L'étape nettoyage et préparation des données m'a permis de créer un fichier csv pour chaque table. Une fois les six tables créées dans SQLite, j'ai chargée les données de chaque fichier dans la table correspondante à l'aide de l'assistant d'import Letos. 
+
+## Analyses métier — exemples
+### 1. Mesurer le montant total des remboursements
+
+**Question métier :** quel est le montant total des remboursements clients ?
+
+sql
+SELECT SUM(Montant_Rb) AS Montant_Total_Remboursements
+FROM Retour_Remboursement;
+
 
 ## Principaux enseignements
 - Les rétractations concentrent le premier montant de remboursement par motif : 931 220,83 €, soit environ 40,70 % du total.
