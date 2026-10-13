@@ -33,7 +33,7 @@ La table Ligne_Expedition relie les commandes, colis et produits. Chaque enregis
 Cette organisation limite la répétition des informations et permet de croiser les données grâce aux clés primaires et étrangères. Le dictionnaire de données documente les champs, les types, les contraintes et les règles de calcul.
 Le dictionnaire décrit les champs, les types, les contraintes et les règles de calcul. Les dates sont stockées comme chaînes de caractères dans la base fournie.
 
-[Schéma relationnel](_2_schéma relationnel_052026.pdf)
+[Schéma relationnel](<_2_schéma relationnel_052026.pdf>)
 
 ## Outils
 - **SQLite** : moteur de la base, stockée dans un fichier.db
