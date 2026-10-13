@@ -58,28 +58,50 @@ Le dictionnaire décrit les champs, les types, les contraintes et les règles de
 Les questions  business portent sur les remboursements, les motifs de retour, la compensation, les transporteurs, les flux non livrés, les départements, les avaries et les marques de multicuiseurs.
 
 ## Chargement des données
-L'étape nettoyage et préparation des données m'a permis de créer un fichier csv pour chaque table. Une fois les six tables créées dans SQLite, j'ai chargée les données de chaque fichier dans la table correspondante à l'aide de l'assistant d'import Letos. 
+L'étape nettoyage et préparation des données m'a permis de créer un fichier csv pour chaque table. Une fois les six tables créées dans SQLite, j'ai chargé les données de chaque fichier dans la table correspondante à l'aide de l'assistant d'import Letos. 
 
 ## Analyses métier — exemples
-### 1. Mesurer le montant total des remboursements
+````sql
+-- Quel est le montant total d’émission de remboursements clients ?
+SELECT SUM(Montant_Rb) AS Montant_Total_Remboursements FROM Retour_Remboursement;
+````
+Résultat: **2 288 004€**
+Ce montant donne une première mesure de l’enjeu financier. Il correspond aux remboursements enregistrés, et non à une perte nette après compensation.
 
-**Question métier :** quel est le montant total des remboursements clients ?
+```sql
+-- Calculer le montant total de compensation récupérée et le montant total remboursé pour les produits ayant été physiquement retournés, afin d'en déduire le taux de compensation. La part du remboursement récupéré grâce à la revalorisation du produit retourné.
+SELECT
+rr.Motif_Rb,
+ROUND(SUM(rr.Montant_Rb) / SUM(le.CA_Vente),2) AS Taux_de_Remboursement
+FROM Ligne_Expedition le
+LEFT JOIN Retour_Remboursement rr ON le.id=rr.Ligne_ExpeditionID
+GROUP BY rr.Motif_Rb;
+```
+Résultat: l'entreprise récupère **1 267 983€, soit 55,42%** du montant total des remboursements. 
+Regaload rembourse le client, puis peut récupérer de la valeur en remettant le produit en stock ou en le revendant à prix réduit. La question mesure cette récupération.
+```sql
+-- Calculer pour chaque marque de multicuiseur le CA total,le montant total remboursé et le taux de remboursement, filtre sur la catégorie produit "Multicuiseur Electrique" afin d'identifier la marque qui génère le moinns de remboursements et donc satisfait le mieux les clients
+SELECT 
+p.Marque_Produit AS Marque,
+ROUND(SUM(le.CA_Vente),2) AS Chiffre_affaires,
+ROUND(SUM(rr.Montant_Rb),2) AS Total_remboursements,
+ROUND(SUM(rr.Montant_Rb) / NULLIF (SUM(le.CA_Vente),0)*100,2) AS Taux_remboursement
+FROM Ligne_Expedition le
+LEFT JOIN Produit p ON le.ProduitID=p.id
+LEFT JOIN Retour_Remboursement rr ON rr.Ligne_ExpeditionID=le.id
+WHERE p.Categorie_Produit_lvl_3 ='MULTICUISEUR ELECTRIQUE'
+GROUP BY p.Marque_Produit
+ORDER BY Taux_remboursement ASC;
+```
+Résultat
+| Marque | CA | Remboursements | Taux de remboursement |
+| --- | :--- | --- | --- |
+| SEB599 | 28 701,24 € | 585,95 €	| 2,04 % |
+| TEF601 | 28 217,53 € | 1 155,13 € |	4,09 % |
+| MOU627 | 70 028,27 € | 3 503,17 € | 5,00 % |
 
-sql
-SELECT SUM(Montant_Rb) AS Montant_Total_Remboursements
-FROM Retour_Remboursement;
+Cet indicateur aide à comparer les marques, sans mesurer directement la satisfaction client ni expliquer les causes des écarts.
 
-
-## Principaux enseignements
-- Les rétractations concentrent le premier montant de remboursement par motif : 931 220,83 €, soit environ 40,70 % du total.
-- La compensation constitue un levier financier important : le montant enregistré représente 55,42 % des remboursements globaux.
-- Les écarts entre transporteurs méritent une investigation : la requête Q6 donne notamment un ratio financier de 7,29 % pour Chronopost et 5,18 % pour Colissimo, sans démontrer à elle seule la responsabilité du transporteur.
-- La segmentation des avaries facilite l’identification d’anomalies : le classeur enregistre 34 remboursements pour la ligne B_9 le 15 mars 2022, pour 3 161,01 €. Ce résultat enregistré n’établit pas à lui seul un lien causal avec l’incident de colle décrit dans la question.
-- Le modèle relationnel permet de relier les dimensions métier, depuis le produit jusqu’au transport et au remboursement.
-
-## Limites de l’étude
-- Le périmètre des expéditions couvre un mois ; l’annualisation de Q4 repose sur une hypothèse de stabilité.
-- Les ratios financiers de remboursement ne sont pas des taux de retour en nombre de commandes ou de colis.
-- La requête Q7 compte des lignes liées aux remboursements ; son résultat ne correspond pas nécessairement à un nombre de colis distincts.
-- Certaines requêtes écrites dans le classeur comportent des erreurs de syntaxe et ne s’exécutent pas telles quelles, notamment Q2, Q3, Q8 et Q9. Les fichiers sources n’ont pas été corrigés pour cette documentation.
-- Les contraintes physiques, les types et les règles décrits dans le dictionnaire doivent être distingués de leur implémentation réelle dans SQLite.
+## Enseignements et limites
+Le modèle relationnel permet de relier les dimensions produit, commande, transport et remboursement. Les requêtes rendent les questions métier mesurables et mettent en évidence des différences à approfondir.
+- Le périmètre d’expédition couvre un mois : il ne permet pas de conclure sur une saisonnalité annuelle. 
