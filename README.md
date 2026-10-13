@@ -34,7 +34,6 @@ Cette organisation limite la répétition des informations et permet de croiser 
 Le dictionnaire décrit les champs, les types, les contraintes et les règles de calcul. Les dates sont stockées comme chaînes de caractères dans la base fournie.
 
 ![Schéma UML](Schema_UML.png)
-[Schéma relationnel](<_2_schéma relationnel_052026.pdf>)
 
 ## Outils
 - **SQLite** : moteur de la base, stockée dans un fichier.db
@@ -111,4 +110,7 @@ Le modèle relationnel permet de relier les dimensions produit, commande, transp
 
 Livrables:
 [Script_tables](Script_requêtes_BDD_Regaload.sql)
+
 [Questions_business](Questions_business_Regaload.sql)
+
+[Schéma relationnel](<_2_schéma relationnel_052026.pdf>)
